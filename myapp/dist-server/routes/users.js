@@ -7,4 +7,5 @@ var router = express.Router();
 /* GET users listing. */
 
 router.post('/signup', _userConotroller.default.userSignup);
+router.post('/signin', _userConotroller.default.userSignin);
 module.exports = router;

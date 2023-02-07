@@ -5,4 +5,6 @@ import userConotroller  from '../controllers/userConotroller';
 
 router.post('/signup',userConotroller.userSignup);
 
+router.post('/signin',userConotroller.userSignin);
+
 module.exports = router;
