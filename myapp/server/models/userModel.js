@@ -1,5 +1,6 @@
 import mongoose, { Schema }  from "mongoose";
 import { connect } from "mongoose"
+import crypto from "crypto"
 const userSchema = new Schema({
     name : 
     {
@@ -16,34 +17,37 @@ const userSchema = new Schema({
     {
         required: true,
         type : String
-    }
+    },
+    emailToken:
+    {
+        required:true,
+        type : String
+    },
+
+    hash : String, 
+    salt : String
 })
 
 
-// emailToken:
-    // {
-    //     required:true,
-    //     type : String
-    // },
 
 
-// userSchema.methods.setPassword = function(password) { 
+userSchema.methods.setPassword = function(password) { 
      
-//     // Creating a unique salt for a particular user 
-//        this.salt = crypto.randomBytes(16).toString('hex'); 
+    // Creating a unique salt for a particular user 
+       this.salt = crypto.randomBytes(16).toString('hex'); 
      
-//        // Hashing user's salt and password with 1000 iterations, 
+       // Hashing user's salt and password with 1000 iterations, 
         
-//        this.hash = crypto.pbkdf2Sync(password, this.salt,  
-//        1000, 64, `sha512`).toString(`hex`); 
-//    }; 
+       this.hash = crypto.pbkdf2Sync(password, this.salt,  
+       1000, 64, `sha512`).toString(`hex`); 
+   }; 
      
-//    // Method to check the entered password is correct or not 
-//    userSchema.methods.validPassword = function(password) { 
-//        var hash = crypto.pbkdf2Sync(password,  
-//        this.salt, 1000, 64, 'sha512').toString('hex'); 
-//        return this.hash === hash; 
-//    }
+   // Method to check the entered password is correct or not 
+   userSchema.methods.validPassword = function(password) { 
+       var hash = crypto.pbkdf2Sync(password,  
+       this.salt, 1000, 64, 'sha512').toString('hex'); 
+       return this.hash === hash; 
+   }
 
 const userModel = mongoose.model('User',userSchema,'users')
 export default userModel

@@ -6,17 +6,27 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _userModel = _interopRequireDefault(require("../models/userModel"));
 var _routes = require("../routes");
+var _crypto = _interopRequireDefault(require("crypto"));
+var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const userSignup = async (req, res, next) => {
   try {
-    const userObject = await _userModel.default.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password
-    });
-    return res.status(200).json({
-      success: true,
-      message: userObject
+    let newUser = new _userModel.default();
+    _userModel.default.findOne({
+      email: req.body.email
+    }).then(user => {
+      if (user) {
+        res.status(401).send("user with same mail already exists");
+      } else {
+        newUser.name = req.body.name;
+        newUser.email = req.body.email;
+        newUser.password = req.body.password;
+        newUser.emailToken = _crypto.default.randomBytes(64).toString('hex');
+        newUser.setPassword(req.body.password);
+        return newUser.save();
+      }
+    }).then(savedUser => {
+      res.status(200).json(savedUser);
     });
   } catch (err) {
     console.log(err);
@@ -29,17 +39,30 @@ const userSignup = async (req, res, next) => {
 const userSignin = async (req, res, next) => {
   _userModel.default.findOne({
     email: req.body.email
-  }), function (err, user) {
+  }, function (err, user) {
     if (user == null) {
       res.status(400).send({
-        message: "please register"
+        message: "error not found"
       });
     } else {
-      return res.status(201).send({
-        message: "user logged in"
-      });
+      if (user.validPassword(req.body.password)) {
+        const token = _jsonwebtoken.default.sign({
+          user_id: user._id,
+          email: user.email
+        }, process.env.TOKEN_KEY, {
+          expiresIn: "2h"
+        });
+        return res.status(201).send({
+          message: "user logged in",
+          token: token
+        });
+      } else {
+        return res.status(400).send({
+          message: "wrong password"
+        });
+      }
     }
-  };
+  });
 };
 var _default = {
   userSignup,
