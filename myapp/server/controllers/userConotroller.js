@@ -64,9 +64,9 @@ const userSignin = async (req,res,next)=>
                 return res.status(201).send({ 
                     success:true,
                     message: "logged in successfully", 
-                    name : Usersignin.name ,
-                    email:Usersignin.email,
-                    data :  Token })
+                    Data : {  name : Usersignin.name ,
+                              email:  Usersignin.email},
+                    token :  Token })
 
         }
         else
