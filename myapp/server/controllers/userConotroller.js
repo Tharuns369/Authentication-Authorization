@@ -2,33 +2,42 @@ import userModel from "../models/userModel";
 import { use } from "../routes";
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
+import EmailServiceProvider from "../services/emailServiceProvider";
 
 
 
+const Sib = require('sib-api-v3-sdk')
+import bcrypt from "bcrypt"
+import emailServiceProvider from "../services/userDataServiceProvider"
+require('dotenv').config()
+
+import userDataServiceProvider  from "../services/userDataServiceProvider";
+import { token } from "morgan";
 const userSignup = async (req, res, next) => {
     try {
-        let newUser = new userModel();
-  
-        userModel.findOne({ email: req.body.email })
-          .then((user) => {
-            if (user) {
-              res.status(401).send("user with same mail already exists");
-            } else {
-              newUser.name = req.body.name;
-              newUser.email = req.body.email;
-              newUser.password = req.body.password;
-              newUser.emailToken=crypto.randomBytes(64).toString('hex')
-              newUser.setPassword(req.body.password);
-              return newUser.save();
-            }
-          })
-          .then((savedUser) => {
-    
-    
-            res.status(200).json(savedUser);
-          })
-        ;
+     const checkingUser = await userModel.findOne({email: req.body.email})
+     if(checkingUser)
+     {
+        res.status(401).send({
+            success:"false",
+            message:"user already exsists"
+        })
+     }
+     else
+     {
 
+        let newUser =  await userDataServiceProvider.createUser(req.body)
+
+        const result = await EmailServiceProvider.sendTransacEmail(newUser.name, newUser.email);
+
+      
+        return res.status(200).json({
+            success: true,
+            message: "User Registered Successfully",
+            data: newUser
+        });
+     }
+      
     } catch (err) {
         console.log(err);
         return res.status(500).json({
@@ -40,20 +49,55 @@ const userSignup = async (req, res, next) => {
 
 const userSignin = async (req,res,next)=>
 {
-    userModel.findOne({ email: req.body.email }, function(err, user) {
-        if (user == null) {
-            res.status(400).send({ message: "error not found" });
-        } else {
-            if (user.validPassword(req.body.password)) {
-                const token = jwt.sign({ user_id: user._id, email: user.email }, process.env.TOKEN_KEY, {
-                    expiresIn: "2h"
-                });
-                return res.status(201).send({ message: "user logged in", token: token });
-            } else {
-                return res.status(400).send({ message: "wrong password" });
-            }
+
+    
+    try{
+
+        const Usersignin= await userDataServiceProvider.signIn(req.body)
+
+        if(Usersignin)
+        {
+          
+
+                const Token =  jwt.sign({ user_id: Usersignin._id, email: Usersignin.email }, process.env.TOKEN_KEY, {
+                expiresIn: "2h" })
+
+                return res.status(201).send({ 
+                    success:true,
+                    message: "Authorized and succesfully logged in", 
+                    data :  Token })
+
         }
-    });
+        else
+        {
+            
+            return res.status(401).send({
+                message:false,
+                message:"not authorized"
+
+            })
+            
+
+             
+        }
+
+        // return res.status(201).json({
+        //     message: "User signed Successfully",
+        //     "token": Usersignin})
+
+        
+
+
+    }
+    catch(err)
+    {
+        console.log(err);
+        return res.status(500).json({
+            success: false,
+            message: err.message || "Something went wrong"
+        })
+    }
+   
 }
 
 

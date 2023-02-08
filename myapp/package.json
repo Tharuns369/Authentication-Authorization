@@ -10,6 +10,7 @@
     "clean": "rimraf dist-server"
   },
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cookie-parser": "~1.4.4",
     "crypto": "^1.0.1",
     "debug": "~2.6.9",
@@ -17,12 +18,14 @@
     "express": "~4.16.1",
     "express-jwt": "^8.4.1",
     "http-errors": "~1.6.3",
+    "install": "^0.13.0",
     "mongoose": "^6.9.0",
     "morgan": "~1.9.1",
     "nodemon": "^2.0.20",
     "npm-run-all": "^4.1.5",
     "pug": "2.0.0-beta11",
-    "rimraf": "^4.1.2"
+    "rimraf": "^4.1.2",
+    "sib-api-v3-sdk": "^8.5.0"
   },
   "main": "app.js",
   "author": "",

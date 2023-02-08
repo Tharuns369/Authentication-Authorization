@@ -16,33 +16,41 @@ const userSchema = new _mongoose.Schema({
   },
   email: {
     required: true,
-    type: String
+    type: String,
+    unique: true
   },
   password: {
     required: true,
     type: String
-  },
-  emailToken: {
-    required: true,
-    type: String
-  },
-  hash: String,
-  salt: String
+  }
+  // emailToken:
+  // {
+  //     required:true,
+  //     type : String
+  // },
+
+  // hash : String, 
+  // salt : String
 });
-userSchema.methods.setPassword = function (password) {
-  // Creating a unique salt for a particular user 
-  this.salt = _crypto.default.randomBytes(16).toString('hex');
 
-  // Hashing user's salt and password with 1000 iterations, 
+// userSchema.methods.setPassword = function(password) { 
 
-  this.hash = _crypto.default.pbkdf2Sync(password, this.salt, 1000, 64, `sha512`).toString(`hex`);
-};
+//     // Creating a unique salt for a particular user 
+//        this.salt = crypto.randomBytes(16).toString('hex'); 
+
+//        // Hashing user's salt and password with 1000 iterations, 
+
+//        this.hash = crypto.pbkdf2Sync(password, this.salt,  
+//        1000, 64, `sha512`).toString(`hex`); 
+//    }; 
 
 // Method to check the entered password is correct or not 
-userSchema.methods.validPassword = function (password) {
-  var hash = _crypto.default.pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
-  return this.hash === hash;
-};
+//    userSchema.methods.validPassword = function(password) { 
+//        var hash = crypto.pbkdf2Sync(password,  
+//        this.salt, 1000, 64, 'sha512').toString('hex'); 
+//        return this.hash === hash; 
+//    }
+
 const userModel = _mongoose.default.model('User', userSchema, 'users');
 var _default = userModel;
 exports.default = _default;
