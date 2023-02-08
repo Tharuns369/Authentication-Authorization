@@ -28,7 +28,7 @@ EmailServiceProvider.sendTransacEmail = async (userName, userEmail) => {
       <a href='https://cules-coding.vercel.app/'>Cules Coding</a>
     `,
     params: {
-      role: 'Backend Developer'
+      role: 'Backend '
     }
   });
 };

@@ -27,7 +27,7 @@ const userSignup = async (req, res, next) => {
       });
     } else {
       let newUser = await _userDataServiceProvider.default.createUser(req.body);
-      const result = await _emailServiceProvider.default.sendTransacEmail(newUser.name, newUser.email);
+      let result = await _emailServiceProvider.default.sendTransacEmail(newUser.name, newUser.email);
       return res.status(200).json({
         success: true,
         message: "User Registered Successfully",

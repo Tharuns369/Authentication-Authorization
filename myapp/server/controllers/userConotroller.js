@@ -8,7 +8,6 @@ import EmailServiceProvider from "../services/emailServiceProvider";
 
 const Sib = require('sib-api-v3-sdk')
 import bcrypt from "bcrypt"
-import emailServiceProvider from "../services/userDataServiceProvider"
 require('dotenv').config()
 
 import userDataServiceProvider  from "../services/userDataServiceProvider";
@@ -28,7 +27,7 @@ const userSignup = async (req, res, next) => {
 
         let newUser =  await userDataServiceProvider.createUser(req.body)
 
-        const result = await EmailServiceProvider.sendTransacEmail(newUser.name, newUser.email);
+        let result = await EmailServiceProvider.sendTransacEmail(newUser.name, newUser.email);
 
       
         return res.status(200).json({
