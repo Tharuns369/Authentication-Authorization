@@ -27,10 +27,11 @@ EmailServiceProvider.sendTransacEmail = async (userName, userEmail) => {
     sender,
     to: receivers,
     htmlContent: `
-      <h1>Hi ${userName} chance to become a {{params.role}} developer</h1>
+      <h1>Hi {{params.name}} chance to become a {{params.role}} developer</h1>
       <a href='https://cules-coding.vercel.app/'>Cules Coding</a>
     `,
     params: {
+      name : userName,
       role: 'Backend ',
     },
   });

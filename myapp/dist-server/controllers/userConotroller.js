@@ -54,19 +54,17 @@ const userSignin = async (req, res, next) => {
       });
       return res.status(201).send({
         success: true,
-        message: "Authorized and succesfully logged in",
+        message: "logged in successfully",
+        name: Usersignin.name,
+        email: Usersignin.email,
         data: Token
       });
     } else {
       return res.status(401).send({
         message: false,
-        message: "not authorized"
+        message: "invalid credintials"
       });
     }
-
-    // return res.status(201).json({
-    //     message: "User signed Successfully",
-    //     "token": Usersignin})
   } catch (err) {
     console.log(err);
     return res.status(500).json({

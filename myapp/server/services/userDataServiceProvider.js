@@ -19,7 +19,8 @@ export class UserDataServiceProvider {
         const user = await userModel.findOne({ email: signInObject.email });
    
         const client = await bcrypt.compare(signInObject.password,user.password)
-        return client
+        console.log(client)
+        return user
        
       }
       
