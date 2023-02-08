@@ -25,8 +25,11 @@ class UserDataServiceProvider {
       email: signInObject.email
     });
     const client = await _bcrypt.default.compare(signInObject.password, user.password);
-    console.log(client);
-    return user;
+    if (client) {
+      return user;
+    } else {
+      return false;
+    }
   }
 }
 exports.UserDataServiceProvider = UserDataServiceProvider;
