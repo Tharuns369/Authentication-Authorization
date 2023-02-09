@@ -2,7 +2,7 @@ const Sib = require('sib-api-v3-sdk')
 
 require('dotenv').config()
 
-export class EmailServiceProvider {}
+export class EmailServiceProvider {}  
 
 const client = Sib.ApiClient.instance;
 

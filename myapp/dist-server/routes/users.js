@@ -8,4 +8,5 @@ var router = express.Router();
 
 router.post('/signup', _userConotroller.default.userSignup);
 router.post('/signin', _userConotroller.default.userSignin);
+router.get("/getprofile", _userConotroller.default.userDashboard);
 module.exports = router;
