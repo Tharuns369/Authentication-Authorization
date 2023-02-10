@@ -1,9 +1,9 @@
 import userModel from "../models/userModel";
 import { use } from "../routes";
+import  Joi from 'joi'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import EmailServiceProvider from "../services/emailServiceProvider";
-
 
 
 
@@ -13,13 +13,38 @@ require('dotenv').config()
 
 import userDataServiceProvider  from "../services/userDataServiceProvider";
 import { token } from "morgan";
-const Reg=/^[a-zA-Z0-9\.]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/
+// const Reg=/^[a-zA-Z0-9\.]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/
 const userSignup = async (req, res, next) => {
     try {
+               console.log("hello")
+              const signupSchema = Joi.object({
+                name :Joi.string()
+                .min(5),
+                email: Joi.string()
+                .email()
+                .required()
+                .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+                password: Joi.string()
+                .min(8)
+                .required()
+                .pattern (new RegExp('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$')),
+                repeat_password: Joi.ref('password')
+       
+         });
 
-           if (Reg.test(req.body.email))
-           {
+        console.log(req.body)
+        const { error, value } = await signupSchema.validate(req.body,
+        {
+            abortEarly:false,
+        });
 
+        if (error) {
+          console.log(error);
+          console.log(req.body.password)
+          return res.send(error.details);
+        }
+        else
+        {
             const checkingUser = await userModel.findOne({email: req.body.email})
             if(checkingUser)
             {
@@ -30,7 +55,6 @@ const userSignup = async (req, res, next) => {
             }
             else
             {
-       
                let newUser =  await userDataServiceProvider.createUser(req.body)
        
                let result = await EmailServiceProvider.sendTransacEmail(newUser.name, newUser.email);
@@ -42,27 +66,13 @@ const userSignup = async (req, res, next) => {
                    data: newUser
                });
             }
-
-
-
-
-           }
-           else
-           {
-                return res.status(401).send(
-                    {
-                        success:false,
-                        message:'please enter valid email'
-                    }
-                )
-           }
-        
-
-        
        
-       
+        }
 
-        } catch (err) {
+        }
+      
+
+        catch (err) {
         console.log(err);
         return res.status(500).json({
             success: false,
@@ -131,7 +141,7 @@ const userDashboard = async (req, res, next) => {
   if (!token) {
     return res.status(400).send({
       success: false,
-      message: "Access Denied. No token provided.",
+      message: "Access Denied.",
     });
   }
 
@@ -141,7 +151,7 @@ const userDashboard = async (req, res, next) => {
     const user = await userModel.findOne({_id:verified.user_id})
     return res.status(200).send({
       success: true,
-      message: "user data",
+      message: "user profile",
       data :  {
                id : user._id,
                name:user.name,

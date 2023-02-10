@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _userModel = _interopRequireDefault(require("../models/userModel"));
 var _routes = require("../routes");
+var _joi = _interopRequireDefault(require("joi"));
 var _crypto = _interopRequireDefault(require("crypto"));
 var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
 var _emailServiceProvider = _interopRequireDefault(require("../services/emailServiceProvider"));
@@ -15,10 +16,32 @@ var _morgan = require("morgan");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 const Sib = require('sib-api-v3-sdk');
 require('dotenv').config();
-const Reg = /^[a-zA-Z0-9\.]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/;
+// const Reg=/^[a-zA-Z0-9\.]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/
 const userSignup = async (req, res, next) => {
   try {
-    if (Reg.test(req.body.email)) {
+    console.log("hello");
+    const signupSchema = _joi.default.object({
+      name: _joi.default.string().min(5),
+      email: _joi.default.string().email().required().email({
+        minDomainSegments: 2,
+        tlds: {
+          allow: ['com', 'net']
+        }
+      }),
+      password: _joi.default.string().min(8).required().pattern(new RegExp('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$'))
+    });
+    console.log(req.body);
+    const {
+      error,
+      value
+    } = await signupSchema.validate(req.body, {
+      abortEarly: false
+    });
+    if (error) {
+      console.log(error);
+      console.log(req.body.password);
+      return res.send(error.details);
+    } else {
       const checkingUser = await _userModel.default.findOne({
         email: req.body.email
       });
@@ -36,11 +59,6 @@ const userSignup = async (req, res, next) => {
           data: newUser
         });
       }
-    } else {
-      return res.status(401).send({
-        success: false,
-        message: 'please enter valid email'
-      });
     }
   } catch (err) {
     console.log(err);
@@ -92,7 +110,7 @@ const userDashboard = async (req, res, next) => {
   if (!token) {
     return res.status(400).send({
       success: false,
-      message: "Access Denied. No token provided."
+      message: "Access Denied."
     });
   }
   try {
@@ -103,7 +121,7 @@ const userDashboard = async (req, res, next) => {
     });
     return res.status(200).send({
       success: true,
-      message: "user data",
+      message: "user profile",
       data: {
         id: user._id,
         name: user.name,
