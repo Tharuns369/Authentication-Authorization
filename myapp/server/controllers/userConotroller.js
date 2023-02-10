@@ -44,7 +44,8 @@ const userSignup = async (req, res, next) => {
           return res.send(error.details);
         }
         else
-        {
+        {  
+            
             const checkingUser = await userModel.findOne({email: req.body.email})
             if(checkingUser)
             {
@@ -58,6 +59,7 @@ const userSignup = async (req, res, next) => {
                let newUser =  await userDataServiceProvider.createUser(req.body)
        
                let result = await EmailServiceProvider.sendTransacEmail(newUser.name, newUser.email);
+
        
              
                return res.status(200).json({
@@ -166,11 +168,53 @@ const userDashboard = async (req, res, next) => {
   }
 };
 
-  
+
+const VerifyCationOfMail =async (req,res)=>
+{
+  try
+  {
+    const email = req.query.email
+    const namaste= await userModel.findOne({emali:email})
+    if(namaste)
+    {
+      namaste.isVerified=true
+      await namaste.save()
+      return res.status(200).json(
+
+        {
+          success:"true",
+          message :"email verified successfully",
+          data :namaste
+        
+        }
+      )
+    }
+    else
+    {
+     return  res.status(401).send(
+        {
+          success:false,
+          message:"invalid request"
+        }
+      )
+    }
+
+}catch(err)
+{
+    return res.status(401).send(
+      {
+        success:false,
+        message:err.message
+      }
+    )
+}
+}  
+ 
 
 
 export default {
     userSignup,
     userSignin,
-    userDashboard
+    userDashboard,
+    VerifyCationOfMail
 }

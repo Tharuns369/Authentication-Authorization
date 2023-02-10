@@ -9,4 +9,5 @@ var router = express.Router();
 router.post('/signup', _userConotroller.default.userSignup);
 router.post('/signin', _userConotroller.default.userSignin);
 router.get("/getprofile", _userConotroller.default.userDashboard);
+router.get("/email-verification", _userConotroller.default.VerifyCationOfMail);
 module.exports = router;

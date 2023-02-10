@@ -22,6 +22,10 @@ const userSchema = new _mongoose.default.Schema({
   password: {
     required: true,
     type: String
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
   }
 });
 const userModel = _mongoose.default.model('User', userSchema, 'users');

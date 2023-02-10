@@ -9,4 +9,6 @@ router.post('/signin',userConotroller.userSignin);
 
 router.get("/getprofile",userConotroller.userDashboard)
 
+router.get("/email-verification",userConotroller.VerifyCationOfMail)
+
 module.exports = router;

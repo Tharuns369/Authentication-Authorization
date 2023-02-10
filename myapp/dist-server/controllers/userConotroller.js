@@ -28,7 +28,8 @@ const userSignup = async (req, res, next) => {
           allow: ['com', 'net']
         }
       }),
-      password: _joi.default.string().min(8).required().pattern(new RegExp('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$'))
+      password: _joi.default.string().min(8).required().pattern(new RegExp('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$')),
+      repeat_password: _joi.default.ref('password')
     });
     console.log(req.body);
     const {
@@ -135,9 +136,37 @@ const userDashboard = async (req, res, next) => {
     });
   }
 };
+const VerifyCationOfMail = async (req, res) => {
+  try {
+    const email = req.query.email;
+    const namaste = await _userModel.default.findOne({
+      emali: email
+    });
+    if (namaste) {
+      namaste.isVerified = true;
+      await namaste.save();
+      return res.status(200).json({
+        success: "true",
+        message: "email verified successfully",
+        data: namaste
+      });
+    } else {
+      return res.status(401).send({
+        success: false,
+        message: "invalid request"
+      });
+    }
+  } catch (err) {
+    return res.status(401).send({
+      success: false,
+      message: err.message
+    });
+  }
+};
 var _default = {
   userSignup,
   userSignin,
-  userDashboard
+  userDashboard,
+  VerifyCationOfMail
 };
 exports.default = _default;

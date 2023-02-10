@@ -1,4 +1,5 @@
 const Sib = require('sib-api-v3-sdk')
+import userConotroller from "../controllers/userConotroller"
 
 require('dotenv').config()
 
@@ -16,25 +17,31 @@ const sender = {
 const transactionalEmailApi = new Sib.TransactionalEmailsApi();
 
 EmailServiceProvider.sendTransacEmail = async (userName, userEmail) => {
-  const receivers = [
-    {
-      email: userEmail,
-    },
-  ];
+  try{
 
-  return transactionalEmailApi.sendTransacEmail({
-    subject: 'Welcome To OROTRON',
-    sender,
-    to: receivers,
-    htmlContent: `
-      <h1>Hi {{params.name}} chance to become a {{params.role}} developer</h1>
-      <a href='https://cules-coding.vercel.app/'>Cules Coding</a>
-    `,
-    params: {
-      name : userName,
-      role: 'Backend ',
-    },
-  });
+    const receivers = [
+      {
+        email: userEmail,
+      },
+    ];
+    return transactionalEmailApi.sendTransacEmail({
+      subject: 'Welcome To OROTRON',
+      sender,
+      to: receivers,
+      htmlContent: `
+        <h1>Hi {{params.name}} chance to become a {{params.role}} developer</h1>
+        <h1>click here to <a href='http://localhost:3000/users/verify-email?email={{params.email}}'> verify </a>your email</h1>
+      `,
+      params: {
+        name:userName,
+        role: 'Backend ',
+        email:userEmail
+      },
+    });
+  }
+  catch (error) {
+    console.error(error);
 };
+}
 
-export default EmailServiceProvider;
+export default EmailServiceProvider
