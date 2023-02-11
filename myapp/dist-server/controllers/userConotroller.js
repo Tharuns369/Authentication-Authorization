@@ -10,6 +10,7 @@ var _joi = _interopRequireDefault(require("joi"));
 var _crypto = _interopRequireDefault(require("crypto"));
 var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
 var _emailServiceProvider = _interopRequireDefault(require("../services/emailServiceProvider"));
+var _joivalidation = _interopRequireDefault(require("../services/joivalidation"));
 var _bcrypt = _interopRequireDefault(require("bcrypt"));
 var _userDataServiceProvider = _interopRequireDefault(require("../services/userDataServiceProvider"));
 var _morgan = require("morgan");
@@ -20,22 +21,10 @@ require('dotenv').config();
 const userSignup = async (req, res, next) => {
   try {
     console.log("hello");
-    const signupSchema = _joi.default.object({
-      name: _joi.default.string().min(5),
-      email: _joi.default.string().email().required().email({
-        minDomainSegments: 2,
-        tlds: {
-          allow: ['com', 'net']
-        }
-      }),
-      password: _joi.default.string().min(8).required().pattern(new RegExp('^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$')),
-      repeat_password: _joi.default.ref('password')
-    });
-    console.log(req.body);
     const {
       error,
       value
-    } = await signupSchema.validate(req.body, {
+    } = await _joivalidation.default.validate(req.body, {
       abortEarly: false
     });
     if (error) {
@@ -109,26 +98,31 @@ const userSignin = async (req, res, next) => {
 const userDashboard = async (req, res, next) => {
   const token = req.header("auth-token");
   if (!token) {
-    return res.status(400).send({
+    return res.status(401).send({
       success: false,
       message: "Access Denied."
     });
   }
   try {
-    const verified = _jsonwebtoken.default.verify(token, process.env.TOKEN_KEY);
-    req.user = verified; //verified is a variable that stores the decoded JWT payload.
+    const decoded = _jsonwebtoken.default.verify(token, process.env.TOKEN_KEY);
+    console.log(typeof decoded);
+    console.log(decoded);
+    // req.user = verified;   //verified is a variable that stores the decoded JWT payload.
     const user = await _userModel.default.findOne({
-      _id: verified.user_id
+      _id: decoded.user_id
     });
-    return res.status(200).send({
-      success: true,
-      message: "user profile",
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-      }
-    });
+    if (user) {
+      return res.status(200).send({
+        success: true,
+        message: "user profile",
+        data: {
+          id: user._id,
+          name: user.name,
+          email: user.email
+        }
+      });
+    }
+    ;
   } catch (err) {
     return res.status(400).send({
       success: false,
@@ -136,30 +130,82 @@ const userDashboard = async (req, res, next) => {
     });
   }
 };
-const VerifyCationOfMail = async (req, res) => {
+
+// const VerifyCationOfMail =async (req,res)=>
+// {
+//   try
+//   {
+//     const email = req.query.email
+//     const namaste= await userModel.findOne({emali:email})
+//     if(namaste)
+//     {
+//       namaste.isVerified=true
+//       await namaste.save()
+//       return res.status(200).json(
+
+//         {
+//           success:"true",
+//           message :"email verified successfully",
+//           data :namaste
+
+//         }
+//       )
+//     }
+//     else
+//     {
+//      return  res.status(401).send(
+//         {
+//           success:false,
+//           message:"invalid request"
+//         }
+//       )
+//     }
+
+// }catch(err)
+// {
+//     return res.status(401).send(
+//       {
+//         success:false,
+//         message:err.message
+//       }
+//     )
+// }
+// }  
+const updatedata = async (req, res, next) => {
   try {
-    const email = req.query.email;
-    const namaste = await _userModel.default.findOne({
-      emali: email
-    });
-    if (namaste) {
-      namaste.isVerified = true;
-      await namaste.save();
-      return res.status(200).json({
-        success: "true",
-        message: "email verified successfully",
-        data: namaste
-      });
-    } else {
+    const token = req.header("auth-token");
+    console.log(token);
+    if (!token) {
       return res.status(401).send({
         success: false,
-        message: "invalid request"
+        message: "Access Denied."
       });
+    } else {
+      const decoded = _jsonwebtoken.default.verify(token, process.env.TOKEN_KEY);
+      const user = await _userModel.default.findOne({
+        email: decoded.email
+      });
+      console.log(user);
+      if (user) {
+        // const up = await user.updateOne({password:req.body.password})
+
+        // user.password=req.body.password
+        console.log(req.body);
+        const hasedpassword = await _bcrypt.default.hash(req.body.password, 10);
+        console.log(hasedpassword);
+        user.password = hasedpassword;
+        await user.save();
+        res.status(200).json({
+          success: true,
+          message: "successfully updated",
+          data: user
+        });
+      }
     }
   } catch (err) {
-    return res.status(401).send({
+    return res.status(400).send({
       success: false,
-      message: err.message
+      message: "fjlfsflj"
     });
   }
 };
@@ -167,6 +213,7 @@ var _default = {
   userSignup,
   userSignin,
   userDashboard,
-  VerifyCationOfMail
+  updatedata
+  // VerifyCationOfMail
 };
 exports.default = _default;

@@ -24,12 +24,15 @@ class UserDataServiceProvider {
     const user = await _userModel.default.findOne({
       email: signInObject.email
     });
-    const client = await _bcrypt.default.compare(signInObject.password, user.password);
-    if (client) {
-      return user;
-    } else {
-      return false;
+    if (user) {
+      const client = await _bcrypt.default.compare(signInObject.password, user.password);
+      if (client) {
+        return user;
+      } else {
+        return false;
+      }
     }
+    return false;
   }
 }
 exports.UserDataServiceProvider = UserDataServiceProvider;

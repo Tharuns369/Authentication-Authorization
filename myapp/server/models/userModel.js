@@ -1,32 +1,32 @@
-import mongoose, { Schema }  from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { connect } from "mongoose"
 import crypto from "crypto"
 const userSchema = new mongoose.Schema({
-    name : 
+    name:
     {
-        required : true ,
-        type : String 
+        required: true,
+        type: String
     },
 
-    email :
+    email:
     {
-        required : true ,
-        type : String,
+        required: true,
+        type: String,
         unique: true
-        },
+    },
     password:
     {
         required: true,
-        type : String,
+        type: String,
     },
     isVerified:
-     {
-         type: Boolean,
-          default: false 
-     }
-  })
+    {
+        type: Boolean,
+        default: false
+    }
+})
 
 
 
-const userModel = mongoose.model('User',userSchema,'users')
+const userModel = mongoose.model('User', userSchema, 'users')
 export default userModel

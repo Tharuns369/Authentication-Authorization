@@ -3,7 +3,7 @@ import userConotroller from "../controllers/userConotroller"
 
 require('dotenv').config()
 
-export class EmailServiceProvider {}  
+export class EmailServiceProvider { }
 
 const client = Sib.ApiClient.instance;
 
@@ -17,7 +17,7 @@ const sender = {
 const transactionalEmailApi = new Sib.TransactionalEmailsApi();
 
 EmailServiceProvider.sendTransacEmail = async (userName, userEmail) => {
-  try{
+  try {
 
     const receivers = [
       {
@@ -33,15 +33,15 @@ EmailServiceProvider.sendTransacEmail = async (userName, userEmail) => {
         <h1>click here to <a href='http://localhost:3000/users/verify-email?email={{params.email}}'> verify </a>your email</h1>
       `,
       params: {
-        name:userName,
+        name: userName,
         role: 'Backend ',
-        email:userEmail
+        email: userEmail
       },
     });
   }
   catch (error) {
     console.error(error);
-};
+  };
 }
 
 export default EmailServiceProvider
