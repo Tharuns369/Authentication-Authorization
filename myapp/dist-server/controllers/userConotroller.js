@@ -66,8 +66,9 @@ const userSignin = async (req, res, next) => {
         user_id: Usersignin._id,
         email: Usersignin.email
       }, process.env.TOKEN_KEY, {
-        expiresIn: "2h"
+        expiresIn: "1h"
       });
+      console.log(Token);
       return res.status(201).send({
         success: true,
         message: "logged in successfully",
@@ -104,6 +105,7 @@ const userDashboard = async (req, res, next) => {
     });
   }
   try {
+    console.log(process.env.TOKEN_KEY);
     const decoded = _jsonwebtoken.default.verify(token, process.env.TOKEN_KEY);
     console.log(typeof decoded);
     console.log(decoded);
@@ -186,21 +188,21 @@ const updatedata = async (req, res, next) => {
         email: decoded.email
       });
       console.log(user);
-      if (user) {
-        // const up = await user.updateOne({password:req.body.password})
 
-        // user.password=req.body.password
-        console.log(req.body);
-        const hasedpassword = await _bcrypt.default.hash(req.body.password, 10);
-        console.log(hasedpassword);
-        user.password = hasedpassword;
-        await user.save();
-        res.status(200).json({
-          success: true,
-          message: "successfully updated",
-          data: user
-        });
-      }
+      // const up = await user.updateOne({password:req.body.password})
+
+      // user.password=req.body.password
+      console.log(req.body);
+      const hasedpassword = await _bcrypt.default.hash(req.body.password, 10);
+      console.log(hasedpassword);
+      user.password = hasedpassword;
+      process.env.TOKEN_KEY = process.env.TOKEN_KEY + hasedpassword;
+      await user.save();
+      res.status(200).json({
+        success: true,
+        message: "successfully updated",
+        data: user
+      });
     }
   } catch (err) {
     return res.status(400).send({

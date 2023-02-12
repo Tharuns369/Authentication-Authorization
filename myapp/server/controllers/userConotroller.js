@@ -76,9 +76,10 @@ const userSignin = async (req, res, next) => {
     if (Usersignin) {
 
 
-      const Token = jwt.sign({ user_id: Usersignin._id, email: Usersignin.email }, process.env.TOKEN_KEY, {
-        expiresIn: "2h"
+      const Token = jwt.sign({ user_id: Usersignin._id, email: Usersignin.email  }, process.env.TOKEN_KEY , {
+        expiresIn: "1h"
       })
+      console.log(Token)
 
       return res.status(201).send({
         success: true,
@@ -131,6 +132,7 @@ const userDashboard = async (req, res, next) => {
   }
 
   try {
+    console.log(process.env.TOKEN_KEY)
     const decoded = jwt.verify(token, process.env.TOKEN_KEY);
     console.log(typeof (decoded))
     console.log(decoded)
@@ -216,8 +218,7 @@ const updatedata = async(req,res,next)=>
         const decoded = jwt.verify(token, process.env.TOKEN_KEY)
         const user = await userModel.findOne({ email: decoded.email })
         console.log(user)
-        if(user)
-        {
+       
           // const up = await user.updateOne({password:req.body.password})
           
           // user.password=req.body.password
@@ -226,6 +227,7 @@ const updatedata = async(req,res,next)=>
           const hasedpassword = await bcrypt.hash(req.body.password, 10)
           console.log(hasedpassword)
           user.password =hasedpassword
+          process.env.TOKEN_KEY = process.env.TOKEN_KEY+hasedpassword
           await user.save()
           res.status(200).json(
             {
@@ -234,7 +236,7 @@ const updatedata = async(req,res,next)=>
               data: user
             }
           )
-        }
+        
         
         
       }
