@@ -1,47 +1,36 @@
+require('dotenv').config();
 const Sib = require('sib-api-v3-sdk')
-import userConotroller from "../controllers/userConotroller"
-
-require('dotenv').config()
-
-export class EmailServiceProvider { }
-
 const client = Sib.ApiClient.instance;
-
 const apiKey = client.authentications['api-key'];
 apiKey.apiKey = process.env.YOUR_API_KEY;
 
-const sender = {
-  email: 'sundar@labsquire.com',
-};
-
-const transactionalEmailApi = new Sib.TransactionalEmailsApi();
-
-EmailServiceProvider.sendTransacEmail = async (userName, userEmail) => {
-  try {
-
-    const receivers = [
-      {
-        email: userEmail,
-      },
-    ];
-    return transactionalEmailApi.sendTransacEmail({
-      subject: 'Welcome To OROTRON',
-      sender,
-      to: receivers,
-      htmlContent: `
-        <h1>Hi {{params.name}} chance to become a {{params.role}} developer</h1>
-        <h1>click here to <a href='http://localhost:3000/users/verify-email?email={{params.email}}'> verify </a>your email</h1>
+class emailServiceProvider {
+  async sendVerifyEmail(email) {
+    const sender = {
+      email: 'sundar@labsquire.com',
+      name: 'Tharun',
+    };
+    const receivers = [{ email }]
+    const transactionalEmailApi = new Sib.TransactionalEmailsApi();
+    try {
+      await transactionalEmailApi.sendTransacEmail({
+        subject: 'Sending verification Email',
+        sender,
+        to: receivers,
+        htmlContent: `
+        <h1>Become a {{params.role}} developer</h1>
+        <a href='http://localhost:3000/users/email-verification?email={{params.email}}'>Please verify your Email</a>
+                 
       `,
-      params: {
-        name: userName,
-        role: 'Backend ',
-        email: userEmail
-      },
-    });
+        params: {
+          role: 'Pro Backend',
+          email: email
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
-  catch (error) {
-    console.error(error);
-  };
 }
 
-export default EmailServiceProvider
+export default new emailServiceProvider();

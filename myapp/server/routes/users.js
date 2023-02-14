@@ -1,16 +1,22 @@
-var express = require('express');
-var router = express.Router();
-import userConotroller from '../controllers/userConotroller';
-/* GET users listing. */
+const express = require('express');
+const  router = express.Router();
 
-router.post('/signup', userConotroller.userSignup);
+import userConotroller from '../../dist-server/controllers/userConotroller';
+import userDataServiceProvider from '../services/userDataServiceProvider';
+import { validateSignup,validateSignin  }from  "../middlewares/validateSignup";
 
-router.post('/signin', userConotroller.userSignin);
+
+router.post('/signup' ,validateSignup, userConotroller.userSignup)
+
+
+router.post('/signin', validateSignin, userConotroller.userSignin);
 
 router.get("/getprofile", userConotroller.userDashboard)
 
-router.patch("/updatedata",userConotroller.updatedata)
+router.post("/forgotpassword",userConotroller.forgotpassword)
 
-// router.get("/email-verification",userConotroller.VerifyCationOfMail)
+router.get("/email-verification",userConotroller.verifyEmail)
+
+
 
 module.exports = router;

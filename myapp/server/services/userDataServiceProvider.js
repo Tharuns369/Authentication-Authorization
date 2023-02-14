@@ -1,6 +1,7 @@
 import userModel from "../models/userModel"
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
+
 import { token } from "morgan"
 import bcrypt from 'bcrypt'
 export class UserDataServiceProvider {
@@ -27,11 +28,38 @@ export class UserDataServiceProvider {
             }
         }
         return false
-
-
+    }
+    // async CheckingUser(obj) {
+    //     const user = await userModel.findOne({ email: obj });
+    //     if (user) {
+    //       return user;
+    //     } else {
+    //       return false;
+    //     }
+    //   }
+    async CheckingUser(email) {
+        const user = await userModel.findOne({ email });
+        if (user) {
+          return user;
+        } else {
+          return false;
+        }
+      }
+      
+    async CheckingUserWithId(id) {
+        const user = await userModel.findOne({ _id: id })
+        if (user) {
+            return user
+        }
+        else {
+            return false
+        }
     }
 
 
 }
+
+
+
 
 export default new UserDataServiceProvider();

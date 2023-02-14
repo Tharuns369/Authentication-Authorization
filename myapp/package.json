@@ -6,7 +6,7 @@
     "build": "npm-run-all clean transpile",
     "server": "node ./dist-server/bin/www",
     "dev": "npm-run-all build server ",
-    "transpile": "babel ./server --out-dir dist-server",
+    "transpile": "babel ./server --out-dir dist-server --source-maps inline --copy-files",
     "clean": "rimraf dist-server"
   },
   "dependencies": {

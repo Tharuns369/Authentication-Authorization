@@ -1,0 +1,11 @@
+{{#extend "layout"}}
+  {{#block "content"}}
+    <h1>Welcome to my site!</h1>
+    <p>Here are some of the latest articles:</p>
+    <ul>
+      {{#each articles}}
+        <li><a href="{{url}}">{{title}}</a></li>
+      {{/each}}
+    </ul>
+  {{/block}}
+{{/extend}}
