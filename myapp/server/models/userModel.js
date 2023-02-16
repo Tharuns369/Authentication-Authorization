@@ -1,6 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import { connect } from "mongoose"
 import crypto from "crypto"
+import { token } from "morgan";
+import { string } from "joi";
 const userSchema = new mongoose.Schema({
     name:
     {
@@ -19,11 +21,28 @@ const userSchema = new mongoose.Schema({
         required: true,
         type: String,
     },
-    isVerified:
+    oldpassword:
+    {
+        // required:true,
+        type:String
+
+    },
+    newpassword:
+    {
+        // required: true,
+        type: String,
+    },
+   
+    Email_Verified:
     {
         type: Boolean,
         default: false
+    },
+    token:
+    {
+        type:String
     }
+
 })
 
 

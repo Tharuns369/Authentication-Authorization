@@ -5,7 +5,7 @@ const apiKey = client.authentications['api-key'];
 apiKey.apiKey = process.env.YOUR_API_KEY;
 
 class emailServiceProvider {
-  async sendVerifyEmail(email) {
+  async sendVerifyEmail(email, token) {
     const sender = {
       email: 'sundar@labsquire.com',
       name: 'Tharun',
@@ -14,17 +14,42 @@ class emailServiceProvider {
     const transactionalEmailApi = new Sib.TransactionalEmailsApi();
     try {
       await transactionalEmailApi.sendTransacEmail({
-        subject: 'Sending verification Email',
+        subject: 'VERIFICATION LINK',
         sender,
         to: receivers,
         htmlContent: `
-        <h1>Become a {{params.role}} developer</h1>
-        <a href='http://localhost:3000/users/email-verification?email={{params.email}}'>Please verify your Email</a>
+        <h1>click Verify your mail to register </h1>
+        <a href='http://localhost:3000/users/email-verification?token=${token}'>Please verify your Email</a>
                  
       `,
         params: {
-          role: 'Pro Backend',
-          email: email
+          token: token
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async sendresetlink(email, token) {
+    const sender = {
+      email: 'sundar@labsquire.com',
+      name: 'Tharun',
+    };
+    const receivers = [{ email }]
+    const transactionalEmailApi = new Sib.TransactionalEmailsApi();
+    try {
+      await transactionalEmailApi.sendTransacEmail({
+        subject: 'RESET PASSWORD',
+        sender,
+        to: receivers,
+        htmlContent: `
+        <h1>click RESET to change password </h1>
+        <a href='http://localhost:3000/users/resetemailverify?token=${token}'>RESET</a>
+                 
+      `,
+        params: {
+          token: token
         },
       });
     } catch (error) {

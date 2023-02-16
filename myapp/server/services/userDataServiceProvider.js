@@ -11,6 +11,7 @@ export class UserDataServiceProvider {
         // newUser.setPassword(userObject.password)
         const hasedpassword = await bcrypt.hash(userObject.password, saltRounds)
         newUser.password = hasedpassword
+        newUser.Email_Verified=false
 
         await newUser.save()
         return newUser
@@ -29,25 +30,18 @@ export class UserDataServiceProvider {
         }
         return false
     }
-    // async CheckingUser(obj) {
-    //     const user = await userModel.findOne({ email: obj });
-    //     if (user) {
-    //       return user;
-    //     } else {
-    //       return false;
-    //     }
-    //   }
+  
     async CheckingUser(email) {
-        const user = await userModel.findOne({ email });
+        const user = await userModel.findOne({ email:email});
         if (user) {
-          return user;
+            return user;
         } else {
-          return false;
+            return false;
         }
-      }
-      
+    }
+
     async CheckingUserWithId(id) {
-        const user = await userModel.findOne({ _id: id })
+        const user = await userModel.findOne({ _id:id })
         if (user) {
             return user
         }
@@ -55,7 +49,7 @@ export class UserDataServiceProvider {
             return false
         }
     }
-
+  
 
 }
 
